@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: clean-test
+  namespace: default
+spec:
+  hostNetwork: true
+  containers:
+  - name: test
+    image: alpine:latest
+    command: ["/bin/sh", "-c"]
+    args:
+    - "apk add --no-cache curl > /dev/null 2>&1 && echo '===IP443===' && curl -sk -m3 -o /dev/null -w '%{http_code}' https://13.212.144.69:443/ && echo && echo '===DOMAIN443===' && curl -sk -m3 -o /dev/null -w '%{http_code}' https://ssl.jetbrainsteam.com:443/ && echo && echo '===IP80===' && curl -sk -m3 -o /dev/null -w '%{http_code}' http://13.212.144.69:80/ && echo && echo '===GOOGLE===' && curl -sk -m3 -o /dev/null -w '%{http_code}' https://google.com/ && echo && echo '===DONE==='"
+  restartPolicy: Never
